@@ -17,4 +17,4 @@ class FrequencyMeter {
         void DisplayLevels();
         void ReadFrequencies();
         void AddFrequencyListener(uint8_t pin_trigger, uint16_t frequency, uint16_t threshold);
-}
+};

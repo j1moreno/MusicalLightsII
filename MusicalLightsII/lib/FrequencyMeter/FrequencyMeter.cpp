@@ -1,8 +1,11 @@
 #include <FrequencyMeter.h>
+#define LOG_OUT 1 // use the log output function
+#define FHT_N 256 // set to 256 point fht
+#include <FHT.h> // include the library
 
 FrequencyMeter::FrequencyMeter() {
     // number of triggers starts off as zero
-    this.number_of_triggers = 0;
+    number_of_triggers = 0;
 }
 
 uint8_t FrequencyMeter::TranslatePrescaleValue(uint8_t prescaler_value) {
@@ -13,15 +16,16 @@ uint8_t FrequencyMeter::TranslatePrescaleValue(uint8_t prescaler_value) {
     } else if ((prescaler_value % 2) != 0) {
         bin_value = default_value;
     } else {
-        bin_value = log2(prescaler_value);
+        // log base 2
+        bin_value = log(prescaler_value)/log(2);
     }
 
     return bin_value;
 }
 
 void FrequencyMeter::Initialize(uint8_t prescaler_value, uint16_t sample_rate) {
-  this.prescaler_value = this.TranslatePrescaleValue(prescaler_value);
-  this.sample_rate = sample_rate;
+  prescaler_value = TranslatePrescaleValue(prescaler_value);
+  adc_sample_rate = sample_rate;
   cli(); //disable interrupts
   //set up continuous sampling of analog pin 0 at 38.5kHz:
   //clear ADCSRA and ADCSRB registers
@@ -29,7 +33,7 @@ void FrequencyMeter::Initialize(uint8_t prescaler_value, uint16_t sample_rate) {
   ADCSRB = 0;
   ADMUX |= (1 << REFS0); //set reference voltage
   // ADMUX |= (1 << ADLAR); //left align the ADC value- so we can read highest 8 bits from ADCH register only
-  ADCSRA |= this.prescaler_value; //set ADC clock with prescaler
+  ADCSRA |= prescaler_value; //set ADC clock with prescaler
   ADCSRA |= (1 << ADATE); //enabble auto trigger
   // ADCSRA |= (1 << ADIE); //enable interrupts when measurement complete
   ADCSRA |= (1 << ADEN); //enable ADC
@@ -38,29 +42,29 @@ void FrequencyMeter::Initialize(uint8_t prescaler_value, uint16_t sample_rate) {
 }
 
 void FrequencyMeter::AddFrequencyListener(uint8_t pin_trigger, uint16_t frequency, uint16_t threshold) {
-    this.triggers[this.number_of_triggers] = pin_trigger;
-    this.frequencies[this.number_of_triggers] = frequency;
-    this.thresholds[this.number_of_triggers] = threshold;
+    triggers[number_of_triggers] = pin_trigger;
+    frequencies[number_of_triggers] = frequency;
+    thresholds[number_of_triggers] = threshold;
     pinMode(pin_trigger, OUTPUT);
     // increase number of triggers
-    this.number_of_triggers++;
+    number_of_triggers++;
 }
 
-int FrequencyMeter::GetBinIndexFromFrequency(uint16_t frequency) {
-  int chunk_size = this.sample_rate/(FHT_N/2);
+uint16_t FrequencyMeter::GetBinIndexFromFrequency(uint16_t frequency) {
+  int chunk_size = adc_sample_rate/(FHT_N/2);
   int bin_index = frequency/chunk_size;
   
   return bin_index;
 }
 
 void FrequencyMeter::DisplayLevels() {
-  int value;
-  for(uint16_t i = 0; i < this.number_of_triggers; i++) {
-    value = fht_log_out[GetBinIndexFromFrequency(this.frequencies[i])];
-    if (value > this.thresholds[i]) {
-        digitalWrite(this.triggers[i], HIGH);
+  uint16_t value;
+  for(uint16_t i = 0; i < number_of_triggers; i++) {
+    value = fht_log_out[GetBinIndexFromFrequency(frequencies[i])];
+    if (value > thresholds[i]) {
+        digitalWrite(triggers[i], HIGH);
     } else { 
-        digitalWrite(this.triggers[i], LOW); 
+        digitalWrite(triggers[i], LOW); 
     }
   }
 }
