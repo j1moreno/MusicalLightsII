@@ -10,6 +10,7 @@ class FrequencyMeter {
         uint8_t prescaler_value;
         uint16_t adc_sample_rate;
         uint16_t GetBinIndexFromFrequency(uint16_t frequency);
+        uint8_t TranslatePrescaleValue(uint8_t prescaler_value);
     public:
         FrequencyMeter();
         void Initialize(uint8_t prescaler_value, uint16_t sample_rate);

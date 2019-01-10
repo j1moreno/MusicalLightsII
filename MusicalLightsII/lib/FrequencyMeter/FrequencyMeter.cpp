@@ -5,7 +5,22 @@ FrequencyMeter::FrequencyMeter() {
     this.number_of_triggers = 0;
 }
 
+uint8_t FrequencyMeter::TranslatePrescaleValue(uint8_t prescaler_value) {
+    uint8_t bin_value;
+    uint8_t default_value = 5;
+    if (prescaler_value < 2) {
+        bin_value = default_value;
+    } else if ((prescaler_value % 2) != 0) {
+        bin_value = default_value;
+    } else {
+        bin_value = log2(prescaler_value);
+    }
+
+    return bin_value;
+}
+
 void FrequencyMeter::Initialize(uint8_t prescaler_value, uint16_t sample_rate) {
+  this.prescaler_value = this.TranslatePrescaleValue(prescaler_value);
   this.sample_rate = sample_rate;
   cli(); //disable interrupts
   //set up continuous sampling of analog pin 0 at 38.5kHz:
@@ -14,7 +29,7 @@ void FrequencyMeter::Initialize(uint8_t prescaler_value, uint16_t sample_rate) {
   ADCSRB = 0;
   ADMUX |= (1 << REFS0); //set reference voltage
   // ADMUX |= (1 << ADLAR); //left align the ADC value- so we can read highest 8 bits from ADCH register only
-  ADCSRA |= (1 << ADPS2) | (1 << ADPS0); //set ADC clock with 32 prescaler- 16mHz/32=500kHz
+  ADCSRA |= this.prescaler_value; //set ADC clock with prescaler
   ADCSRA |= (1 << ADATE); //enabble auto trigger
   // ADCSRA |= (1 << ADIE); //enable interrupts when measurement complete
   ADCSRA |= (1 << ADEN); //enable ADC
