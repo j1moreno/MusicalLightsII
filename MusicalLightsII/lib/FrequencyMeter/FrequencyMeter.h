@@ -12,7 +12,7 @@ class FrequencyMeter {
         uint16_t GetBinIndexFromFrequency(uint16_t frequency);
     public:
         FrequencyMeter();
-        void Initialize(uint8_t prescaler_value);
+        void Initialize(uint8_t prescaler_value, uint16_t sample_rate);
         void DisplayLevels();
         void ReadFrequencies();
         void AddFrequencyListener(uint8_t pin_trigger, uint16_t frequency, uint16_t threshold);
