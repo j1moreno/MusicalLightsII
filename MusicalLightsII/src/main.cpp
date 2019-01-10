@@ -9,12 +9,12 @@ FrequencyMeter meter;
 
 void setup(){
   meter.Initialize(PRESCALER_VALUE, SAMPLE_RATE);
-  meter.AddFrequencyListener(13, 40, 175);
+  meter.AddFrequencyListener(13, 75, 175);
   meter.AddFrequencyListener(12, 200, 154);
   meter.AddFrequencyListener(11, 500, 120);
   meter.AddFrequencyListener(10, 40, 140);
   meter.AddFrequencyListener(9, 5000, 75);
-  meter.AddFrequencyListener(8, 10000, 75);
+  meter.AddFrequencyListener(8, 9000, 75);
 }
 
 void loop() {
