@@ -5,7 +5,8 @@ FrequencyMeter::FrequencyMeter() {
     this.number_of_triggers = 0;
 }
 
-void FrequencyMeter::Initialize(uint8_t prescaler_value) {
+void FrequencyMeter::Initialize(uint8_t prescaler_value, uint16_t sample_rate) {
+  this.sample_rate = sample_rate;
   cli(); //disable interrupts
   //set up continuous sampling of analog pin 0 at 38.5kHz:
   //clear ADCSRA and ADCSRB registers
@@ -31,7 +32,7 @@ void FrequencyMeter::AddFrequencyListener(uint8_t pin_trigger, uint16_t frequenc
 }
 
 int FrequencyMeter::GetBinIndexFromFrequency(uint16_t frequency) {
-  int chunk_size = SAMPLE_RATE/(FHT_N/2);
+  int chunk_size = this.sample_rate/(FHT_N/2);
   int bin_index = frequency/chunk_size;
   
   return bin_index;
