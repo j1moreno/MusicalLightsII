@@ -42,9 +42,9 @@ void FrequencyMeter::Initialize(uint8_t prescaler_value, uint16_t sample_rate) {
 }
 
 void FrequencyMeter::AddFrequencyListener(uint8_t pin_trigger, uint16_t frequency, uint16_t threshold) {
-  triggers[number_of_triggers_] = pin_trigger;
-  frequencies[number_of_triggers_] = frequency;
-  thresholds[number_of_triggers_] = threshold;
+  triggers_[number_of_triggers_] = pin_trigger;
+  frequencies_[number_of_triggers_] = frequency;
+  thresholds_[number_of_triggers_] = threshold;
   pinMode(pin_trigger, OUTPUT);
   // increase number of triggers
   number_of_triggers_++;
@@ -60,11 +60,11 @@ uint16_t FrequencyMeter::GetBinIndexFromFrequency(uint16_t frequency) {
 void FrequencyMeter::DisplayLevels() {
   uint16_t value;
   for (uint16_t i = 0; i < number_of_triggers_; i++) {
-    value = fht_log_out[GetBinIndexFromFrequency(frequencies[i])];
-    if (value > thresholds[i]) {
-      digitalWrite(triggers[i], HIGH);
+    value = fht_log_out[GetBinIndexFromFrequency(frequencies_[i])];
+    if (value > thresholds_[i]) {
+      digitalWrite(triggers_[i], HIGH);
     } else { 
-      digitalWrite(triggers[i], LOW);
+      digitalWrite(triggers_[i], LOW);
     }
   }
 }

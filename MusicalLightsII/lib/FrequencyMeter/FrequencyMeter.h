@@ -14,9 +14,9 @@ class FrequencyMeter {
 
  private:
   uint8_t number_of_triggers_;
-  uint16_t triggers[BUFFER_SIZE];
-  uint16_t frequencies[BUFFER_SIZE];
-  uint16_t thresholds[BUFFER_SIZE];
+  uint16_t triggers_[BUFFER_SIZE];
+  uint16_t frequencies_[BUFFER_SIZE];
+  uint16_t thresholds_[BUFFER_SIZE];
   uint8_t prescaler_value_;
   uint16_t adc_sample_rate_;
   uint16_t GetBinIndexFromFrequency(uint16_t frequency);
