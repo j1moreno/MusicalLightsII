@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <FrequencyMeter.h>
-// 19.2kHz = arduino default freq * default prescaler / custom prescaler
-// 12.2kHz = 9.6kHz * 128 / 32
+// sampling rate = adc default freq * default prescaler / custom prescaler
+// 38.4kHz = 9.6kHz * 128 / 32
 #define SAMPLE_RATE 19200 
 #define PRESCALER_VALUE 32
 
