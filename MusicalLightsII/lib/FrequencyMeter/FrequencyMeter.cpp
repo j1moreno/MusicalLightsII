@@ -26,19 +26,26 @@ uint8_t FrequencyMeter::TranslatePrescaleValue(uint8_t prescaler_value) {
 void FrequencyMeter::Initialize(uint8_t prescaler_value, uint16_t sample_rate) {
   prescaler_value_ = TranslatePrescaleValue(prescaler_value);
   adc_sample_rate_ = sample_rate;
-  cli(); //disable interrupts
-  //set up continuous sampling of analog pin 0 at 38.5kHz:
-  //clear ADCSRA and ADCSRB registers
+  // Begin ADC setup for continuous sampling of analog pin 0 at 38.5kHz:
+  // Disable interrupts
+  cli();
+  // Clear ADCSRA and ADCSRB registers, set each bit in the registers to be 0
   ADCSRA = 0;
   ADCSRB = 0;
-  ADMUX |= (1 << REFS0); //set reference voltage
+  // Set reference voltage -- REFS[2:0] = 1 will select AVcc
+  ADMUX |= (1 << REFS0); 
   // ADMUX |= (1 << ADLAR); //left align the ADC value- so we can read highest 8 bits from ADCH register only
-  ADCSRA |= prescaler_value_; //set ADC clock with prescaler
-  ADCSRA |= (1 << ADATE); //enabble auto trigger
+  // Set ADC clock with prescaler
+  ADCSRA |= prescaler_value_;
+  // Enable auto-trigger; source is given by ADTS[2:0] in ADCSRB register
+  ADCSRA |= (1 << ADATE);
   // ADCSRA |= (1 << ADIE); //enable interrupts when measurement complete
-  ADCSRA |= (1 << ADEN); //enable ADC
-  ADCSRA |= (1 << ADSC); //start ADC measurements
-  sei();//enable interrupts
+  // Enable ADC
+  ADCSRA |= (1 << ADEN);
+  // Start ADC measurements
+  ADCSRA |= (1 << ADSC);
+  // Re-enable interrupts
+  sei();
 }
 
 void FrequencyMeter::AddFrequencyListener(uint8_t pin_trigger, uint16_t frequency, uint16_t threshold) {
