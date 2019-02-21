@@ -23,23 +23,29 @@ uint8_t FrequencyMeter::TranslatePrescaleValue(uint8_t prescaler_value) {
   return bin_value;
 }
 
-void FrequencyMeter::Initialize(uint8_t prescaler_value, uint16_t sample_rate) {
+void FrequencyMeter::Initialize(uint8_t analog_input_pin, uint16_t sample_rate, uint8_t prescaler_value) {
   prescaler_value_ = TranslatePrescaleValue(prescaler_value);
   adc_sample_rate_ = sample_rate;
   // Begin ADC setup for continuous sampling of analog pin 0 at 38.5kHz:
-  // Disable interrupts
+  // Disable interrupts for now
   cli();
   // Clear ADCSRA and ADCSRB registers, set each bit in the registers to be 0
   ADCSRA = 0;
   ADCSRB = 0;
+  // Set input pin
+  uint8_t input_pin = analog_input_pin - PIN_A0;
+  if (input_pin > 0) {
+    // only have to set bits if input pin is something other than A0
+    ADMUX |= input_pin;
+  }
   // Set reference voltage -- REFS[2:0] = 1 will select AVcc
-  ADMUX |= (1 << REFS0); 
-  // ADMUX |= (1 << ADLAR); //left align the ADC value- so we can read highest 8 bits from ADCH register only
+  ADMUX |= (1 << REFS0);
   // Set ADC clock with prescaler
   ADCSRA |= prescaler_value_;
   // Enable auto-trigger; source is given by ADTS[2:0] in ADCSRB register
   ADCSRA |= (1 << ADATE);
-  // ADCSRA |= (1 << ADIE); //enable interrupts when measurement complete
+  // Explicitly define auto-trigger source
+  ADCSRB &= 0xF4; // last 3 bits set to 0 -> free running mode
   // Enable ADC
   ADCSRA |= (1 << ADEN);
   // Start ADC measurements
@@ -77,7 +83,8 @@ void FrequencyMeter::DisplayLevels() {
 }
 
 void FrequencyMeter::ReadFrequencies() {
-  cli();  // UDRE interrupt slows this way down on arduino uno
+  // Disable interrupts for now
+  cli();
   for (int i = 0 ; i < FHT_N ; i++) { // sample size is FHT_N
     while (!(ADCSRA & 0x10)); // wait for adc to be ready
     ADCSRA = 0xf5;            // restart adc
@@ -92,5 +99,6 @@ void FrequencyMeter::ReadFrequencies() {
   fht_reorder();  // reorder the data before doing the fht
   fht_run();      // process the data in the fht
   fht_mag_log();  // take the output of the fht
+  // Re-enable interrupts
   sei();
 }
