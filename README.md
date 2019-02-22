@@ -10,8 +10,9 @@ Link to demo: https://www.youtube.com/watch?v=G9xe7mXnQbs
 ```C++
 FrequencyMeter meter;
 
-// higher sampling rate yields better resolution for input, but less granularity for frequency ranges
-meter.Initialize(sampling_rate);
+// higher sampling rate allows larger frequency ranges to be read from 
+// input, but less granularity for selecting frequency ranges to trigger from
+meter.Initialize(analog_pin_to_read_from, sampling_rate);
 // when frequency is detected at or above sensitivity level, pin will go HIGH
 meter.AddFrequencyListener(pin_to_activate, frequency_in_hz, sensitivity);
 // add as many listeners as desired, limited by number of digital output pins on arduino (14 on uno).
