@@ -22,7 +22,7 @@ uint8_t FrequencyMeter::GetPrescaleOffset(uint16_t sampling_rate) {
   // formula is based on default 16MHz system clock on Arduino Uno
   // 13 is the number of clock cycles it takes to complete one conversion.
   // prescaler_value = system_clock/13/sampling rate
-  float prescaler_value = 16000000/13/sampling_rate;
+  float prescaler_value = system_clock_frequency_/13/sampling_rate;
   // define bin_value to be closest power of 2 by taking log base 2
   // since this may not be a whole number, round first.
   bin_value = (int) round(log(prescaler_value)/log(2));
@@ -39,7 +39,7 @@ uint8_t FrequencyMeter::GetPrescaleOffset(uint16_t sampling_rate) {
 void FrequencyMeter::Initialize(uint8_t analog_input_pin, uint16_t sample_rate) {
   uint8_t prescaler_offset = GetPrescaleOffset(sample_rate);
   // Set true calculated ADC sample rate
-  adc_sample_rate_ = 16000000/13/pow(2, prescaler_offset);
+  adc_sample_rate_ = system_clock_frequency_/13/pow(2, prescaler_offset);
   // Begin ADC setup for continuous sampling of analog pin 0 at 38.5kHz:
   // Disable interrupts for now
   cli();

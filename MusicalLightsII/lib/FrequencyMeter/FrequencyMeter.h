@@ -13,6 +13,7 @@ class FrequencyMeter {
   void AddFrequencyListener(uint8_t pin_trigger, uint16_t frequency, uint16_t threshold);
 
  private:
+  const uint32_t system_clock_frequency_ = 16000000;
   uint8_t number_of_triggers_;
   uint16_t triggers_[BUFFER_SIZE];
   uint16_t frequencies_[BUFFER_SIZE];
