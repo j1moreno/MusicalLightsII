@@ -10,7 +10,7 @@ Link to demo: https://www.youtube.com/watch?v=G9xe7mXnQbs
 ```C++
 FrequencyMeter meter;
 
-// higher sampling rate allows larger frequency ranges to be read from 
+// higher sampling rate allows more frequencies to be read from 
 // input, but less granularity for selecting frequency ranges to trigger from
 meter.Initialize(analog_pin_to_read_from, sampling_rate);
 // when frequency is detected at or above sensitivity level, pin will go HIGH
