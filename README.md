@@ -3,6 +3,8 @@ Arduino library to sync a custom-length string of lights to music.
 
 Detects frequency ranges in audio signals and activates lights accordingly.
 
+Link to demo: https://www.youtube.com/watch?v=G9xe7mXnQbs
+
 ## Usage
 
 ```C++
