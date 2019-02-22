@@ -36,8 +36,8 @@ uint8_t FrequencyMeter::GetPrescaleOffset(uint8_t sampling_rate) {
 
 // Initializes the FrequencyMeter object by setting up and preparing the
 // ADC to sample the desired analog input pin at the specified sample rate.
-void FrequencyMeter::Initialize(uint8_t analog_input_pin, uint16_t sample_rate, uint8_t prescaler_value) {
-  uint8_t prescaler_offset = GetPrescaleOffset(prescaler_value);
+void FrequencyMeter::Initialize(uint8_t analog_input_pin, uint16_t sample_rate) {
+  uint8_t prescaler_offset = GetPrescaleOffset(sample_rate);
   adc_sample_rate_ = sample_rate;
   // Begin ADC setup for continuous sampling of analog pin 0 at 38.5kHz:
   // Disable interrupts for now

@@ -7,7 +7,7 @@
 class FrequencyMeter {
  public:
   FrequencyMeter();
-  void Initialize(uint8_t analog_input_pin, uint16_t sample_rate, uint8_t prescaler_value = 32);
+  void Initialize(uint8_t analog_input_pin, uint16_t sample_rate = 38500);
   void DisplayLevels();
   void ReadFrequencies();
   void AddFrequencyListener(uint8_t pin_trigger, uint16_t frequency, uint16_t threshold);
