@@ -12,20 +12,26 @@ FrequencyMeter::FrequencyMeter() {
 }
 
 // Private method for calculating the bit offset for register ADCSRA
-// based on prescaler value.
-uint8_t FrequencyMeter::GetPrescaleOffset(uint8_t prescaler_value) {
-  uint8_t bin_value;
+// based on desired sampling rate. Actual sampling rate may not be 
+// exactly equal to input parameter, because it is calculated using
+// powers of 2; actual sampling rate will be closest configurable value.
+uint8_t FrequencyMeter::GetPrescaleOffset(uint8_t sampling_rate) {
+  uint16_t bin_value;
+  // define default value, in case bin_value is calculated to be out of bounds
   uint8_t default_value = 5;
-  if (prescaler_value < 2) {
-    bin_value = default_value;
-  } else if ((prescaler_value % 2) != 0) {
-    bin_value = default_value;
-  } else {
-    // log base 2
-    bin_value = log(prescaler_value)/log(2);
-  }
+  // formula is based on default 16MHz system clock on Arduino Uno
+  // 13 is the number of clock cycles it takes to complete one conversion.
+  // prescaler_value = system_clock/13/sampling rate
+  float prescaler_value = 16000000/13/sampling_rate;
+  // define bin_value to be closest power of 2 by taking log base 2
+  // since this may not be a whole number, round first.
+  bin_value = (int) round(log(prescaler_value)/log(2));
 
-  return bin_value;
+  // if bin_value is determined to be between prescaler bounds, return it
+  // otherwise return default value, which will set the sampling rate 
+  // to be about 38.5kHz, sufficient for capturing most frequencies found 
+  // in audio signals.
+  return (bin_value <= 128 && bin_value >= 2) ? bin_value : default_value;
 }
 
 // Initializes the FrequencyMeter object by setting up and preparing the

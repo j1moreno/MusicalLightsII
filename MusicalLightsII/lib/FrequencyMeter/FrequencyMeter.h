@@ -19,6 +19,6 @@ class FrequencyMeter {
   uint16_t thresholds_[BUFFER_SIZE];
   uint16_t adc_sample_rate_;
   uint16_t GetBinIndexFromFrequency(uint16_t frequency);
-  uint8_t GetPrescaleOffset(uint8_t prescaler_value);
+  uint8_t GetPrescaleOffset(uint8_t sampling_rate);
 };
 #endif  // FREQUENCY_METER_H_
