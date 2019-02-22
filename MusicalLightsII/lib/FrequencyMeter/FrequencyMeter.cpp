@@ -3,11 +3,16 @@
 #define FHT_N 256 // set to 256 point fht
 #include <FHT.h> // include the library
 
+// Constructor for FrequencyMeter object. 
+// Sets number of triggers to be zero.
+// Initialize method will need to be called before usage. 
 FrequencyMeter::FrequencyMeter() {
   // number of triggers starts off as zero
   number_of_triggers_ = 0;
 }
 
+// Private method for calculating the bit offset for register ADCSRA
+// based on prescaler value.
 uint8_t FrequencyMeter::GetPrescaleOffset(uint8_t prescaler_value) {
   uint8_t bin_value;
   uint8_t default_value = 5;
@@ -23,6 +28,8 @@ uint8_t FrequencyMeter::GetPrescaleOffset(uint8_t prescaler_value) {
   return bin_value;
 }
 
+// Initializes the FrequencyMeter object by setting up and preparing the
+// ADC to sample the desired analog input pin at the specified sample rate.
 void FrequencyMeter::Initialize(uint8_t analog_input_pin, uint16_t sample_rate, uint8_t prescaler_value) {
   uint8_t prescaler_offset = GetPrescaleOffset(prescaler_value);
   adc_sample_rate_ = sample_rate;
@@ -54,6 +61,9 @@ void FrequencyMeter::Initialize(uint8_t analog_input_pin, uint16_t sample_rate, 
   sei();
 }
 
+// Adds a listener for a frequency range containing the specified frequency, 
+// and triggers specified output pin when frequency magnitude is above the 
+// given threshold.
 void FrequencyMeter::AddFrequencyListener(uint8_t pin_trigger, uint16_t frequency, uint16_t threshold) {
   triggers_[number_of_triggers_] = pin_trigger;
   frequencies_[number_of_triggers_] = frequency;
@@ -63,6 +73,8 @@ void FrequencyMeter::AddFrequencyListener(uint8_t pin_trigger, uint16_t frequenc
   number_of_triggers_++;
 }
 
+// Determines which FHT output bin contains frequency range corresponding 
+// to the desired frequency.
 uint16_t FrequencyMeter::GetBinIndexFromFrequency(uint16_t frequency) {
   int chunk_size = adc_sample_rate_/(FHT_N/2);
   int bin_index = frequency/chunk_size;
@@ -70,6 +82,7 @@ uint16_t FrequencyMeter::GetBinIndexFromFrequency(uint16_t frequency) {
   return bin_index;
 }
 
+// Sets pins HIGH based on frequency listeners.
 void FrequencyMeter::DisplayLevels() {
   uint16_t value;
   for (uint16_t i = 0; i < number_of_triggers_; i++) {
@@ -82,6 +95,9 @@ void FrequencyMeter::DisplayLevels() {
   }
 }
 
+// Samples input signal at adc_sample_rate until required number of samples 
+// for FHT is reached. FHT operation is then performed to determine 
+// frequency components present in sampled signal.
 void FrequencyMeter::ReadFrequencies() {
   // Disable interrupts for now
   cli();
