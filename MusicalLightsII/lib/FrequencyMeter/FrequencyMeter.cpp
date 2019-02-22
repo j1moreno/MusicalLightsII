@@ -15,7 +15,7 @@ FrequencyMeter::FrequencyMeter() {
 // based on desired sampling rate. Actual sampling rate may not be 
 // exactly equal to input parameter, because it is calculated using
 // powers of 2; actual sampling rate will be closest configurable value.
-uint8_t FrequencyMeter::GetPrescaleOffset(uint8_t sampling_rate) {
+uint8_t FrequencyMeter::GetPrescaleOffset(uint16_t sampling_rate) {
   uint16_t bin_value;
   // define default value, in case bin_value is calculated to be out of bounds
   uint8_t default_value = 5;
@@ -26,19 +26,20 @@ uint8_t FrequencyMeter::GetPrescaleOffset(uint8_t sampling_rate) {
   // define bin_value to be closest power of 2 by taking log base 2
   // since this may not be a whole number, round first.
   bin_value = (int) round(log(prescaler_value)/log(2));
-
+  
   // if bin_value is determined to be between prescaler bounds, return it
   // otherwise return default value, which will set the sampling rate 
   // to be about 38.5kHz, sufficient for capturing most frequencies found 
   // in audio signals.
-  return (bin_value <= 128 && bin_value >= 2) ? bin_value : default_value;
+  return (bin_value <= 7 && bin_value >= 0) ? bin_value : default_value;
 }
 
 // Initializes the FrequencyMeter object by setting up and preparing the
 // ADC to sample the desired analog input pin at the specified sample rate.
 void FrequencyMeter::Initialize(uint8_t analog_input_pin, uint16_t sample_rate) {
   uint8_t prescaler_offset = GetPrescaleOffset(sample_rate);
-  adc_sample_rate_ = sample_rate;
+  // Set true calculated ADC sample rate
+  adc_sample_rate_ = 16000000/13/pow(2, prescaler_offset);
   // Begin ADC setup for continuous sampling of analog pin 0 at 38.5kHz:
   // Disable interrupts for now
   cli();
