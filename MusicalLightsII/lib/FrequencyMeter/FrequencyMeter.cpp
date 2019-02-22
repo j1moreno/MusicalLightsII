@@ -8,7 +8,7 @@ FrequencyMeter::FrequencyMeter() {
   number_of_triggers_ = 0;
 }
 
-uint8_t FrequencyMeter::TranslatePrescaleValue(uint8_t prescaler_value) {
+uint8_t FrequencyMeter::GetPrescaleOffset(uint8_t prescaler_value) {
   uint8_t bin_value;
   uint8_t default_value = 5;
   if (prescaler_value < 2) {
@@ -24,7 +24,7 @@ uint8_t FrequencyMeter::TranslatePrescaleValue(uint8_t prescaler_value) {
 }
 
 void FrequencyMeter::Initialize(uint8_t analog_input_pin, uint16_t sample_rate, uint8_t prescaler_value) {
-  prescaler_value_ = TranslatePrescaleValue(prescaler_value);
+  uint8_t prescaler_offset = GetPrescaleOffset(prescaler_value);
   adc_sample_rate_ = sample_rate;
   // Begin ADC setup for continuous sampling of analog pin 0 at 38.5kHz:
   // Disable interrupts for now
@@ -41,7 +41,7 @@ void FrequencyMeter::Initialize(uint8_t analog_input_pin, uint16_t sample_rate, 
   // Set reference voltage -- REFS[2:0] = 1 will select AVcc
   ADMUX |= (1 << REFS0);
   // Set ADC clock with prescaler
-  ADCSRA |= prescaler_value_;
+  ADCSRA |= prescaler_offset;
   // Enable auto-trigger; source is given by ADTS[2:0] in ADCSRB register
   ADCSRA |= (1 << ADATE);
   // Explicitly define auto-trigger source

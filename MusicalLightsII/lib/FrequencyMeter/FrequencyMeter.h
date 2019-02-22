@@ -17,9 +17,8 @@ class FrequencyMeter {
   uint16_t triggers_[BUFFER_SIZE];
   uint16_t frequencies_[BUFFER_SIZE];
   uint16_t thresholds_[BUFFER_SIZE];
-  uint8_t prescaler_value_;
   uint16_t adc_sample_rate_;
   uint16_t GetBinIndexFromFrequency(uint16_t frequency);
-  uint8_t TranslatePrescaleValue(uint8_t prescaler_value);
+  uint8_t GetPrescaleOffset(uint8_t prescaler_value);
 };
 #endif  // FREQUENCY_METER_H_
